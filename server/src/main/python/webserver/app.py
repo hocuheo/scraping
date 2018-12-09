@@ -13,5 +13,5 @@ logging.basicConfig(
 
 if __name__ == '__main__':
     # connections.create_connection(hosts=['localhost'])
-    app.run("localhost", 9090)
+    app.run("0.0.0.0", 9090)
 

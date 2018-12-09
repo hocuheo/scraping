@@ -1,11 +1,10 @@
 import os
-import pymongo
+# import pymongo
 import logging
 from scrapy import signals
 from scrapy.crawler import Crawler
 from scrapy.utils.project import get_project_settings
 
-from scrapers.spiders.general import GeneralSpider
 from scrapers.spiders.aio import AIOSpider
 
 
@@ -13,7 +12,6 @@ os.environ['SCRAPY_SETTINGS_MODULE'] = 'scrapers.settings'
 
 def run(spider=AIOSpider, *args, **kwargs):
     settings = get_project_settings()
-
     runner = GeneralCrawler(spider, settings=settings)
     return runner.crawl(
         *args,
@@ -25,9 +23,9 @@ def print_err(e):
     logging.exception(e)
 
 class GeneralCrawler(Crawler):
-    count = 0
-    items = []
     def crawl(self, *args, **kwargs):
+        self._items = []
+        self._count = 0
         logging.info(self.settings)
         # mongo_host = self.settings.get('MONGODB_HOST')
         # mongo_port = self.settings.get('MONGODB_PORT')
@@ -45,19 +43,20 @@ class GeneralCrawler(Crawler):
         # logging.info(self.connection.server_info())
         logging.info("Success connection")
 
-        self.signals.connect(self.item_scraped, signals.item_scraped)
         d = super(GeneralCrawler, self).crawl(runner=self, *args, **kwargs)
-        d.addCallback(self.results)
+        self.signals.connect(self.item_scraped, signals.item_scraped)
+
+        d.addCallback(self.collect_results)
         d.addErrback(print_err)
         return d
 
     def item_scraped(self, item, response, spider):
         if item:
-            self.items.append(dict(item))
+            self._items.append(dict(item))
 
-    def results(self, _):
+    def collect_results(self, _):
         return {
             "shop": self.spidercls.name,
-            "count": self.count,
-            "items": self.items
+            "count": self._count,
+            "items": self._items
         }

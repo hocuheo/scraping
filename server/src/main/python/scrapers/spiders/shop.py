@@ -28,11 +28,15 @@ class GiganSpider(scrapy.Spider):
                  size,
                  *args,
                  **kwargs):
-        print(kwargs)
         super(GiganSpider, self).__init__(*args, **kwargs)
-        self.url = "https://www.gigantti.fi/search?SearchTerm={query}&ContentElementCount={size}".format(
-            query=query,
-            size=size
+        self.page = 1
+        self.total_pages = math.ceil(size / 12)
+        self.url = "https://www.gigantti.fi/search?SearchTerm={query}".format(
+            query=query
+        )
+        #&PageNumber=1
+        self.url_next = "https://www.gigantti.fi/INTERSHOP/web/WFS/store-gigantti-Site/fi_FI/-/EUR/ViewParametricSearchBySearchIndex-OfferPaging?SearchTerm={query}&SearchParameter=%26%40QueryTerm%3D{query}%26online%3D1&SortingAttribute=&ContentElementCount=13&StoreElementCount=0&searchResultTab=Products".format(
+            query=query
         )
         self.logger.info(self.url)
         self.runner = runner
@@ -43,8 +47,10 @@ class GiganSpider(scrapy.Spider):
 
     def parse(self, response):
         items = response.css(self.info_selectors['item'])
-        count = response.css(self.info_selectors['count']).extract_first()
-        self.runner.count = count
+        if self.page == 1:
+
+            count = response.css(self.info_selectors['count']).extract_first()
+            self.runner._count = count
         for item in items:
             item = {
                 key: item.css(selector).extract_first()
@@ -53,6 +59,12 @@ class GiganSpider(scrapy.Spider):
             item['image'] = response.urljoin(item['image'])
             yield item
 
+        if self.page < self.total_pages:
+            self.page += 1
+            yield scrapy.Request(
+                url=self.url + "&PageNumber={}".format(self.page - 1),
+                callback=self.parse
+            )
 
 # https://www.verkkokauppa.com/fi/search?query=ssd&page=2 #max 60
 # .search-result-count
@@ -66,7 +78,6 @@ class GiganSpider(scrapy.Spider):
 
 class VerkkoSpider(scrapy.Spider):
     name = 'verkkokauppa'
-    page = 1
     info_selectors = {
         "count": ".search-result-count::text",
         "item": ".list-product"
@@ -85,8 +96,8 @@ class VerkkoSpider(scrapy.Spider):
                  size,
                  *args,
                  **kwargs):
-        print(kwargs)
         super(VerkkoSpider, self).__init__(*args, **kwargs)
+        self.page = 1
         self.total_pages = math.ceil(size / 60)
         self.url = "https://www.verkkokauppa.com/fi/search?query={query}".format(
             query=query,
@@ -101,8 +112,10 @@ class VerkkoSpider(scrapy.Spider):
 
     def parse(self, response):
         items = response.css(self.info_selectors['item'])
-        count = response.css(self.info_selectors['count']).extract_first()
-        self.runner.count = count
+        if self.page == 1:
+            count = response.css(self.info_selectors['count']).extract_first()
+            if count:
+                self.runner._count = count.replace('tuotetta', '')
         for item in items:
             item = {
                 key: item.css(selector).extract_first()
@@ -114,6 +127,6 @@ class VerkkoSpider(scrapy.Spider):
         if self.page < self.total_pages:
             self.page += 1
             yield scrapy.Request(
-                url=self.url + "&page={}".format(self.page),
+                url=self.url_next + "&page={}".format(self.page),
                 callback=self.parse
             )

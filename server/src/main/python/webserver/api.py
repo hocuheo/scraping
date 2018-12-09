@@ -1,9 +1,12 @@
+import os
+
 from klein import Klein
+from twisted.web.static import File
 from scrapers import crawler
 from scrapers.spiders.shop import GiganSpider, VerkkoSpider
 from twisted.internet import defer
 from urllib.parse import quote_plus
-from common.redis import redis_store
+# from common.redis import redis_store
 
 import json
 
@@ -28,6 +31,13 @@ def group_result(shops, results):
         for idx, shop in enumerate(shops)
         if results[idx]
     }
+
+@app.route('/', branch=True)
+def index(request):
+    print(os.path.dirname(__file__))
+    resource_path = os.path.abspath(os.path.dirname(__file__ )+ '../../../resources/public')
+    print(resource_path)
+    return File(resource_path)
 
 
 @app.route('/crawl')
@@ -54,6 +64,7 @@ def search(request):
     deferred = defer.gatherResults([
         crawler.run(spider=get_spider(shop), query=query, size=size) for shop in shops
     ])
+    # deferred = crawler.run(spider=get_spider(shops[0]), query=query, size=size)
     deferred.addCallback(lambda results: group_result(shops, results))
     # deferred.addCallback(lambda results: store_results(results, query))
     deferred.addCallback(lambda results: json.dumps(results))

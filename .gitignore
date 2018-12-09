@@ -2,3 +2,4 @@
 **/__pycache__/**
 **/elasticsearch-data/**
 **/elasticsearch-data-persistence/**
+server/src/main/resources/public/*
