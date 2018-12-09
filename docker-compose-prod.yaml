@@ -1,0 +1,54 @@
+version: '2.1'
+services:
+  proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
+      - ./docker/certs:/etc/nginx/certs:ro
+  ssl-companion:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: ssl-companion
+    volumes:
+      - ./docker/certs:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    volumes_from:
+      - proxy
+    depends_on:
+      - proxy
+  app-redis:
+    image: redis:3.2.10
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    expose:
+      - '6379'
+  app-thesis:
+    image: mokemon/thesproj
+    restart: always
+    container_name: thesis
+    depends_on:
+      app-redis:
+        condition: service_healthy
+    healthcheck:
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    environment:
+      - AUTH_ENABLED=true
+    expose:
+      - "9090"
+    environment:
+      - VIRTUAL_HOST=thesis.chin.phobo.xyz
+      - VIRTUAL_PORT=9090
+      - LETSENCRYPT_HOST=thesis.chin.phobo.xyz
+      - LETSENCRYPT_EMAIL=beochot@gmail.com
+

@@ -1,11 +1,14 @@
-.PHONY: start-server build
+.PHONY: start build stop logs
 
-start-server:
+start:
 	cp -rf client/ server/src/main/resources/public/
-	PYTHONPATH=server/src/main/python python3 server/src/main/python/webserver/app.py
+	docker-compose up -d
+
+stop:
+	docker-compose down
+
+logs:
+	docker-compose logs -f
 
 build:
-	docker build -t mokemon/thesproj .
-
-build-stack:
-	echo ""
+	docker-compose build

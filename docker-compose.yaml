@@ -1,0 +1,28 @@
+version: '2.1'
+services:
+  app-redis:
+    image: redis:3.2.10
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    expose:
+      - '6379'
+  app-thesis:
+    build: .
+    restart: always
+    container_name: thesis
+    depends_on:
+      app-redis:
+        condition: service_healthy
+    healthcheck:
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    environment:
+      - AUTH_ENABLED=false
+    ports:
+      - "9090:9090"
+
