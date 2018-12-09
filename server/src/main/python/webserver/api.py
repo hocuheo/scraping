@@ -83,14 +83,16 @@ def index(request):
 @app.route('/crawl')
 @auth
 def crawl(request):
-    d = crawler.run([
+    d = crawler.run(urls=[
+        'https://news.ycombinator.com/',
+        'https://www.bbc.co.uk/',
         'http://kenh14.vn/',
         'http://www.4chan.org',
         'https://twitter.com/Twitter',
         'https://www.reddit.com/r/doge',
         'https://www.reddit.com/r/news',
         'https://medium.com/',
-        'https://www.quora.com/What-is-a-software-developer-What-do-they-do'
+        'https://www.quora.com/What-is-a-software-developer-What-do-they-do',
         'https://academia.stackexchange.com/'
     ])
     d.addCallback(lambda output: json.dumps(output))

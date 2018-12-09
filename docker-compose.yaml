@@ -13,7 +13,7 @@ services:
   app-elastic:
     image: bitnami/elasticsearch
     volumes:
-      - ./elasticsearch-data:/bitnami/elasticsearch/data
+      - "./elasticsearch-data:/bitnami/elasticsearch/data"
     expose:
       - '9200'
       - '9300'
