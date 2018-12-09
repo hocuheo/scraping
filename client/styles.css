@@ -30,6 +30,9 @@
     height: 25px;
     flex: 1;
     margin-right: 5px;
+    font-size: 1em;
+    padding: 15px;
+    box-sizing: border-box;
 }
 
 .comparison__search button {
@@ -60,13 +63,27 @@
     font-weight: 700;
 }
 
+.comparison__article-link {
+    display: block;
+    height: 76px;
+    overflow: hidden;
+}
+
 .comparison__result-articles {
+    margin-top: 30px;
 }
 
 .comparison__article {
     list-style: none;
     display: inline-block;
     max-width: 150px;
+}
+
+.comparison__article:hover {
+    border: 1px solid black;
+    background-color: rgba(255, 255, 255, 0.7);
+    transform: scale(1.3);
+    padding: 5px;
 }
 
 .comparison__article-image {

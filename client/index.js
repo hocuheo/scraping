@@ -14,7 +14,15 @@
 
     var Api = {
         getArticles: (query) => {
-            return fetch('/search?shops=gigantti,verkkokauppa&size=100&query=' + query).then(
+            return fetch(
+                '/search?shops=gigantti,verkkokauppa&size=100&query=' + query,
+                {
+                    method: "GET",
+                    headers: {
+                        "Authorization": new Date().getTime() / 1000
+                    },
+                }
+            ).then(
                 response => response.json().then(data => data)
             );
         }
