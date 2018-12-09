@@ -31,6 +31,13 @@ services:
       retries: 10
     expose:
       - '6379'
+  app-elastic:
+    image: bitnami/elasticsearch
+    volumes:
+      - ./elasticsearch-data:/bitnami/elasticsearch/data
+    expose:
+      - '9200'
+      - '9300'
   app-thesis:
     image: mokemon/thesproj
     restart: always
@@ -51,4 +58,3 @@ services:
       - VIRTUAL_PORT=9090
       - LETSENCRYPT_HOST=thesis.chin.phobo.xyz
       - LETSENCRYPT_EMAIL=beochot@gmail.com
-

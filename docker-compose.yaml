@@ -10,6 +10,13 @@ services:
       retries: 10
     expose:
       - '6379'
+  app-elastic:
+    image: bitnami/elasticsearch
+    volumes:
+      - ./elasticsearch-data:/bitnami/elasticsearch/data
+    expose:
+      - '9200'
+      - '9300'
   app-thesis:
     build: .
     restart: always

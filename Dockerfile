@@ -16,12 +16,13 @@ RUN apt-get install -y --no-install-recommends gcc build-essential libxml2-dev l
 RUN mkdir -p /app/
 WORKDIR /app/
 
-COPY server/ /app/
 COPY server/requirements.txt /app/
 
 RUN pip3 install --upgrade setuptools wheel
 
 RUN pip3 install -r /app/requirements.txt
+
+COPY server/ /app/
 
 ENV LANG=en_US.UTF-8
 ENV PYTHONPATH=/app/src/main/python
