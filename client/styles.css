@@ -1,5 +1,76 @@
-.app {
+#app {
     display: flex;
-    flex-wrap: wrap;
-    background-color: lightgray;
+    flex-direction: column;
+    height: 100%;
 }
+
+.loader-container {
+    background-color: rgba(211,211,211, 0.8);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+}
+
+.hidden {
+    display: none;
+}
+
+.comparison__search {
+    display: flex;
+    padding: 5px;
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 0;
+}
+
+.comparison__search input {
+    height: 25px;
+    flex: 1;
+    margin-right: 5px;
+}
+
+.comparison__search button {
+    height: 31px;
+}
+
+.comparison__results {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+}
+
+.comparison__result {
+    flex: 1;
+    text-align: center;
+}
+
+.comparison__result-count::before {
+    content: 'Number of results: '
+}
+
+.comparison__result:nth-child(even) {
+    border-left: 2px solid grey;
+}
+
+.comparison__result-title {
+    text-transform: capitalize;
+    font-weight: 700;
+}
+
+.comparison__result-articles {
+}
+
+.comparison__article {
+    list-style: none;
+    display: inline-block;
+    max-width: 150px;
+}
+
+.comparison__article-image {
+    width:  134.2px;
+    height: 93.39px;
+}
+
