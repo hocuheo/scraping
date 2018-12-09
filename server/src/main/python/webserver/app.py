@@ -1,6 +1,6 @@
 import logging
 
-# from elasticsearch_dsl.connections import connections
+from elasticsearch_dsl.connections import connections
 
 from datetime import datetime
 from webserver.api import app
@@ -12,6 +12,6 @@ logging.basicConfig(
 )
 
 if __name__ == '__main__':
-    # connections.create_connection(hosts=['localhost'])
+    connections.create_connection(hosts=['app-elastic'])
     app.run("0.0.0.0", 9090)
 

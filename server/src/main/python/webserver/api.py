@@ -1,7 +1,9 @@
 import os
 import functools
 import json
+
 from datetime import datetime
+from elasticsearch_dsl import Q, Search
 
 from klein import Klein
 from twisted.web.static import File
@@ -11,6 +13,7 @@ from twisted.internet import defer
 from twisted.internet import threads
 from urllib.parse import quote_plus
 from common.redis import redis_store
+from common.models import Page
 
 import json
 
@@ -108,3 +111,13 @@ def search(request):
     deferred.addCallback(lambda results: store_results(results, query))
     deferred.addCallback(lambda results: json.dumps(results))
     return deferred
+
+@app.route('/gsearch')
+@auth
+def g_search(request):
+    query = request.args.get(b'query')[0].decode().lower().strip()
+    q = Q('multi_match', fields=['tags', 'title', 'body'], query=query)
+
+    elastic_req = Page.search().highlight('title', 'body', 'tags', fragment_size=200, pre_tags=['<b>'], post_tags=['</b>']).query(q)
+    response = json.dumps(elastic_req.execute().to_dict()['hits']['hits'])
+    return response

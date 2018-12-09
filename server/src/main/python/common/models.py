@@ -17,7 +17,3 @@ class Page(Document):
 
     class Index:
         name = 'test'
-
-
-
-

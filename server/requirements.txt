@@ -3,5 +3,5 @@ typing==3.6.6
 Scrapy==1.5.1
 redis==2.10.6
 selenium==3.8.1
-requests==2.18.4
+requests==2.20.1
 elasticsearch-dsl==6.2.1
