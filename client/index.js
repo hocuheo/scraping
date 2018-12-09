@@ -7,14 +7,14 @@
     }
     function $$ (selector, el) {
         if (el) {
-            return el.querySelector(selector);
+            return el.querySelectorAll(selector);
         }
         return document.querySelectorAll(selector);
     }
 
     var Api = {
-        getArticles: (query) => {
-            return fetch(
+        getArticles: (query) =>
+            fetch(
                 '/search?shops=gigantti,verkkokauppa&size=100&query=' + query,
                 {
                     method: "GET",
@@ -24,12 +24,30 @@
                 }
             ).then(
                 response => response.json().then(data => data)
-            );
-        }
+            ),
+        dogeSearch: (query) => 
+            fetch(
+                '/gsearch?query=' + query,
+                {
+                    method: "GET",
+                    headers: {
+                        "Authorization": new Date().getTime() / 1000
+                    },
+                }
+            ).then(
+                response => response.json()
+                    .then(data => data.map(
+                        e => Object.assign(
+                            e._source,
+                            { body: e._source.body.substr(0, 210) },
+                            e.highlight
+                        )
+                    ))
+            )
     };
 
     var Store = function(state, reducers) {
-        self = this;
+        var self = this;
         self.observers = [];
         self.state = state || {};
         self.dispatch = function(action) {
@@ -58,10 +76,27 @@
                     state,
                     { search: { results: action.results }, loading: false }
                 );
+            case "@doge/request":
+                return Object.assign(
+                    state,
+                    { doge: { query: action.query, results: undefined }, loading: true }
+                );
+            case "@doge/done":
+                return Object.assign(
+                    state,
+                    { doge: { results: action.results }, loading: false }
+                );
+            case "@switch":
+                return Object.assign(
+                    state,
+                    { content: action.content }
+                );
         }
         return state;
     }
-    var store = new Store({}, reducers);
+    var store = new Store({
+        conten: 'comparison'
+    }, reducers);
 
     function Component(el) {
         this.element = el;
@@ -71,7 +106,7 @@
     }
     Component.prototype.react = function(component) {}
 
-    function SearchBar(el) {
+    function SearchBar(el, options) {
         Component.call(this, el);
         var self = this;
         var input = $('input', el);
@@ -82,15 +117,9 @@
                 submitBtn.click();
             }
         });
-        submitBtn.addEventListener("click", function(event) {
+        submitBtn.addEventListener("click", () => {
             var query = input.value;
-            store.dispatch({ type: '@search/request', query: query });
-            Api.getArticles(query).then(data => {
-                store.dispatch({ type: '@search/done', results: data });
-            }).catch(e => {
-                console.error(e);
-                store.dispatch({ type: '@search/done', results: response });
-            })
+            options.onClick(query);
         });
     };
     function SearchResult(sides = []) {
@@ -128,7 +157,6 @@
 
     function Article(el, data) {
         Component.call(this, el);
-        var self = this;
         $('.comparison__article-image', el).src = data.image;
         $('.comparison__article-link', el).href = data.link;
         $('.comparison__article-link', el).textContent = data.name;
@@ -181,13 +209,101 @@
         }
     }
 
-    var App = new Component($('#app'));
+    function Menu(el, options) {
+        Component.call(this, el);
+        var self = this;
+        self.options = options.map(option => {
+            var item = document.createElement('li');
+            item.classList.add('navigation-item');
+            item.textContent = option.value;
+            item.dataset.key = option.key;
+            if (option.selected) {
+                item.classList.add('navigation-item--selected');
+            }
+            self.element.appendChild(item);
+        });
+        
+        self.element.addEventListener("click", function(event) {
+            var target = event.target;
+            var selectedItem = target.closest('.navigation-item');
+            if (selectedItem) {
+                Array.from($$('.navigation-item', el)).forEach(
+                    e => e.classList.remove('navigation-item--selected')
+                )
+                selectedItem.classList.add('navigation-item--selected');
+                var key = selectedItem.dataset.key;
+                store.dispatch({ type: '@switch', content: key })
+            }
+        });
+    }
+
+    function DogeTextResult(el, data) {
+        Component.call(this, el);
+        $('.doge__result-link', el).href = data.url;
+        $('.doge__result-title', el).innerHTML = data.title;
+        $('.doge__result-origin', el).textContent = data.url;
+        $('.doge__result-body', el).innerHTML = data.body || '';
+        $('.doge__result-tags', el).innerHTML = data.tags || '';
+    };
+
+    function DogeTextResultList() {
+        var el = document.createElement('ul');
+        el.classList.add('doge__results');
+        Component.call(this, el);
+        var self = this;
+        self.article_template = $('template#doge__result').content;
+        self.clear = function () {
+            while (self.element.firstChild) {
+                self.element.removeChild(self.element.firstChild);
+            }
+        }
+        self.update = function(dogeData) {
+            self.clear();
+            dogeData.forEach(doge => {
+                var el = new DogeTextResult(self.article_template.cloneNode(true), doge);
+                Component.prototype.append.call(self, el);
+            });
+        }
+    };
+
+    DogeTextResultList.prototype.react = function(gState) {
+        var state = gState.doge;
+        if (state && state.results) {
+            this.update(state.results);
+        }
+    }
+
     var LoaderEl = new Loader($('.loader-container'));
-    var searchBar = new SearchBar(
-        $('template#comparison__search').content.cloneNode(true)
+    var ComparisonSearchBar = new SearchBar(
+        $('template#comparison__search').content.cloneNode(true),
+        {
+            onClick: function(query) {
+                store.dispatch({ type: '@search/request', query: query });
+                Api.getArticles(query).then(data => {
+                    store.dispatch({ type: '@search/done', results: data });
+                }).catch(e => {
+                    console.error(e);
+                    store.dispatch({ type: '@search/done', results: [] });
+                })
+            }
+        }
+    );
+    var DogeSearchBar = new SearchBar(
+        $('template#comparison__search').content.cloneNode(true),
+        {
+            onClick: function(query) {
+                store.dispatch({ type: '@doge/request', query: query });
+                Api.dogeSearch(query).then(data => {
+                    store.dispatch({ type: '@doge/done', results: data });
+                }).catch(e => {
+                    console.error(e);
+                    store.dispatch({ type: '@doge/done', results: [] });
+                })
+            }
+        }
     );
 
-    var searchResult = new SearchResult([
+    var ComparisonSearchResult = new SearchResult([
         {
             key: 'verkkokauppa',
             shop: 'Verkkokauppa',
@@ -200,9 +316,41 @@
         }
     ]);
 
-    App.append(searchBar);
-    App.append(searchResult);
+    var App = new Component($('#app'));
+    var Comparison = new Component($('#comparison'));
+    var DogeSearch = new Component($('#doge-search'));
+    App.react = function(state) {
+        var pages = Array.from($$('#app #page > *'));
+        pages.forEach(page => {
+            if (page.id === state.content) {
+                page.classList.remove('hidden');
+            } else {
+                page.classList.add('hidden');
+            }
+        });
+    };
 
+    var Menu = new Menu($('#navigation'), [
+        {
+            key: 'comparison',
+            selected: true,
+            value: 'Comparison'
+        },
+        {
+            key: 'doge-search',
+            selected: false,
+            value: 'DSearch'
+        }
+    ]);
+
+    var DogeResults = new DogeTextResultList();
+
+    Comparison.append(ComparisonSearchBar);
+    Comparison.append(ComparisonSearchResult);
+    DogeSearch.append(DogeSearchBar);
+    DogeSearch.append(DogeResults);
+    store.register(App);
     store.register(LoaderEl);
-    store.register(searchResult);
+    store.register(ComparisonSearchResult);
+    store.register(DogeResults);
 })();
