@@ -6,15 +6,15 @@ matrix:
         - cd server
       script:
         - echo "Test back"
-
     - language: node_js
       node_js:
         - "iojs"
         - "7"
       before_script:
-        - cd clien
+        - cd client
       script:
         - echo "Test front"
+        - make build-deploy
 
 notifications:
   email:

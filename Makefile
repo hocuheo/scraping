@@ -1,4 +1,4 @@
-.PHONY: start build stop logs
+.PHONY: start build stop logs build-deploy
 
 start:
 	docker-compose up -d
@@ -12,3 +12,7 @@ logs:
 build:
 	cp -rf client/ server/src/main/resources/public/
 	docker-compose build
+
+build-deploy:
+	cp -rf client/ server/src/main/resources/public/
+	docker build -t mokemon/thesproj .
