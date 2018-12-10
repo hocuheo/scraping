@@ -95,7 +95,7 @@
         return state;
     }
     var store = new Store({
-        conten: 'comparison'
+        content: 'comparison'
     }, reducers);
 
     function Component(el) {
