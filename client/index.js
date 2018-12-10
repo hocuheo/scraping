@@ -15,7 +15,7 @@
     var Api = {
         getArticles: (query) =>
             fetch(
-                '/search?shops=gigantti,verkkokauppa&size=100&query=' + query,
+                '/search?shops=gigantti,verkkokauppa,jimms&size=100&query=' + query,
                 {
                     method: "GET",
                     headers: {
@@ -312,6 +312,11 @@
         {
             key: 'gigantti',
             shop: 'Gigantti',
+            count: 'No result'
+        },
+        {
+            key: 'jimms',
+            shop: "JIMM'S",
             count: 'No result'
         }
     ]);

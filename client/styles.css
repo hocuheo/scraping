@@ -47,7 +47,6 @@ ul {
 #comparison {
     display: flex;
     flex-direction: column;
-    height: 100%;
 }
 
 .loader-container {
@@ -100,7 +99,7 @@ ul {
     content: 'Number of results: '
 }
 
-.comparison__result:nth-child(even) {
+.comparison__result:nth-child(n+2) {
     border-left: 2px solid grey;
 }
 
