@@ -1,0 +1,21 @@
+matrix:
+  include:
+    - language: python
+      python: 3.6
+      before_script:
+        - cd server
+      script:
+        - echo "Test back"
+
+    - language: node_js
+      node_js:
+        - "iojs"
+        - "7"
+      before_script:
+        - cd clien
+      script:
+        - echo "Test front"
+
+notifications:
+  email:
+    - beochot@protonmail.com
