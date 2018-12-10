@@ -15,6 +15,11 @@ matrix:
       script:
         - echo "Test back"
         - make build-deploy
+      after_success:
+        - if [[ "$TRAVIS_BRANCH" == "master" ]]; then
+            docker login -u $DOCOYOU -p $DOCOPA ;
+            docker push mokemon/thesproj
+          fi
 
 notifications:
   email:
