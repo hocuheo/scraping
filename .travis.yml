@@ -1,11 +1,5 @@
 matrix:
   include:
-    - language: python
-      python: 3.6
-      before_script:
-        - cd server
-      script:
-        - echo "Test back"
     - language: node_js
       node_js:
         - "iojs"
@@ -14,6 +8,13 @@ matrix:
         - cd client
       script:
         - echo "Test front"
+    - language: python
+      python: 3.6
+      services:
+        - docker
+      script:
+        - echo "Test back"
+        - pwd
         - make build-deploy
 
 notifications:

@@ -14,5 +14,5 @@ build:
 	docker-compose build
 
 build-deploy:
-	cp -rf client/ server/src/main/resources/public/
+	cp -rf ./client/ ./server/src/main/resources/public/
 	docker build -t mokemon/thesproj .
