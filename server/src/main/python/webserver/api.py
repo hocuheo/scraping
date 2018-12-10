@@ -8,7 +8,7 @@ from elasticsearch_dsl import Q, Search
 from klein import Klein
 from twisted.web.static import File
 from scrapers import crawler
-from scrapers.spiders.shop import GiganSpider, VerkkoSpider
+from scrapers.spiders.shop import GiganSpider, VerkkoSpider, JimmsSpider
 from twisted.internet import defer
 from twisted.internet import threads
 from urllib.parse import quote_plus
@@ -23,6 +23,8 @@ app = Klein()
 def get_spider(shop):
     if shop == 'gigantti':
         return GiganSpider
+    elif shop == 'jimms':
+        return JimmsSpider
     else:
         return VerkkoSpider
 
