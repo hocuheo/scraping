@@ -16,13 +16,13 @@ matrix:
         - echo "Test back"
         - make build-deploy
       after_success:
-        - if [[ $TRAVIS_PULL_REQUEST == false && $TRAVIS_BRANCH == 'master' ]];
-          then
-            echo "$DOCOPA" | docker login -u "$DOCOYOU" --password-stdin
-            docker push mokemon/thesproj
+        - |
+          if [[ $TRAVIS_PULL_REQUEST == false && $TRAVIS_BRANCH == 'master' ]]; then
+            echo $DOCOPA | docker login -u $DOCOYOU --password-stdin;
+            docker push mokemon/thesproj;
           else
-            echo $TRAVIS_PULL_REQUEST
-            echo $TRAVIS_BRANCH
+            echo $TRAVIS_PULL_REQUEST;
+            echo $TRAVIS_BRANCH;
           fi
 
 notifications:
