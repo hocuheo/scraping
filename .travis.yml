@@ -17,7 +17,7 @@ matrix:
         - make build-deploy
       after_success:
         - echo $TRAVIS_BRANCH
-        - if [[ $TRAVIS_PULL_REQUEST == “false” ]] && [[ $TRAVIS_BRANCH == “master” ]];
+        - if [[ $TRAVIS_PULL_REQUEST == false && $TRAVIS_BRANCH == 'master' ]];
           then
             docker login -u $DOCOYOU -p $DOCOPA
             docker push mokemon/thesproj;
