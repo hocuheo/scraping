@@ -54,7 +54,7 @@ services:
     expose:
       - "9090"
     environment:
-      - VIRTUAL_HOST=thesis.chin.phobo.xyz
       - VIRTUAL_PORT=9090
-      - LETSENCRYPT_HOST=thesis.chin.phobo.xyz
-      - LETSENCRYPT_EMAIL=beochot@gmail.com
+      - VIRTUAL_HOST
+      - LETSENCRYPT_HOST
+      - LETSENCRYPT_EMAIL
