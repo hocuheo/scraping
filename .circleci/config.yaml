@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6.4
+      - image: docker:17.05.0-ce-git
+   steps:
+      - checkout
+      - run:
+          command: |
+            make build-deploy
+            if [ $CIRCLE_BRANCH = master ]; then 
+              echo "Test"
+              echo $DOCOPA | docker login -u $DOCOYOU --password-stdin;
+              docker push mokemon/thesproj;
+            fi
