@@ -4,13 +4,13 @@ jobs:
     docker:
       - image: circleci/python:3.6.4
       - image: docker:17.05.0-ce-git
-   steps:
+    steps:
       - checkout
-      - run:
-          command: |
+      - run: |
             make build-deploy
             if [ $CIRCLE_BRANCH = master ]; then 
               echo "Test"
               echo $DOCOPA | docker login -u $DOCOYOU --password-stdin;
               docker push mokemon/thesproj;
             fi
+      
