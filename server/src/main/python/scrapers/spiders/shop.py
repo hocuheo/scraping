@@ -65,7 +65,7 @@ class GiganSpider(scrapy.Spider):
         if self.page < self.total_pages:
             self.page += 1
             yield scrapy.Request(
-                url=self.url + "&PageNumber={}".format(self.page - 1),
+                url=self.url_next + "&PageNumber={}".format(self.page - 1),
                 callback=self.parse
             )
 
@@ -130,7 +130,7 @@ class VerkkoSpider(scrapy.Spider):
         if self.page < self.total_pages:
             self.page += 1
             yield scrapy.Request(
-                url=self.url_next + "&page={}".format(self.page),
+                url=self.url + "&page={}".format(self.page),
                 callback=self.parse
             )
 
