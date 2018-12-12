@@ -5,7 +5,9 @@ jobs:
       - image: docker:17.05.0-ce-git
     steps:
       - checkout
-      - run: |
+      - run:
+          name: Building
+          command: |
             cp -rf ./client/ ./server/src/main/resources/public/
 	          docker build -t mokemon/thesproj .
             if [ $CIRCLE_BRANCH = master ]; then 
