@@ -6,6 +6,8 @@ jobs:
     steps:
       - checkout
       - run: |
+            pwd
+            ls
             make build-deploy
             if [ $CIRCLE_BRANCH = master ]; then 
               echo "Test"
