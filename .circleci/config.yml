@@ -15,4 +15,3 @@ jobs:
               echo $DOCOPA | docker login -u $DOCOYOU --password-stdin;
               docker push mokemon/thesproj;
             fi
-      
