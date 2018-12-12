@@ -5,13 +5,19 @@ jobs:
       - image: docker:17.05.0-ce-git
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
-          name: Building
+          name: Building frontend
+          command: cp -rf ./client/ ./server/src/main/resources/public/
+      - run:
+          name: Building Docker image
+          command: docker build -t mokemon/thesproj .
+      - run:
+          name: Pushing Docker image
           command: |
-            cp -rf ./client/ ./server/src/main/resources/public/
-	          docker build -t mokemon/thesproj .
-            if [ $CIRCLE_BRANCH = master ]; then 
-              echo "Test"
-              echo $DOCOPA | docker login -u $DOCOYOU --password-stdin;
-              docker push mokemon/thesproj;
-            fi
+              if [ $CIRCLE_BRANCH = master ]; then 
+                echo "Test"
+                echo $DOCOPA | docker login -u $DOCOYOU --password-stdin;
+                docker push mokemon/thesproj;
+              fi
