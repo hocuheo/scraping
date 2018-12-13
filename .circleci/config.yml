@@ -18,6 +18,6 @@ jobs:
           command: |
               if [ $CIRCLE_BRANCH = master ]; then 
                 echo "Test"
-                echo $DOCOPA | docker login -u $DOCOYOU --password-stdin;
+                docker login -u $DOCOYOU -p $DOCOPA;
                 docker push mokemon/thesproj;
               fi
