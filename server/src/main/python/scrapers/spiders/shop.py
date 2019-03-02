@@ -124,9 +124,11 @@ class VerkkoSpider(scrapy.Spider):
                 key: item.css(selector).extract_first()
                 for key, selector in self.item_selectors.items()
             }
-            item['image'] = response.urljoin(item['image'])
-            item['link'] = response.urljoin(item['link'])
-            yield item
+            if item['image'] and item['link'] and item['sku']:
+                item['image'] = response.urljoin(item['image'])
+                item['link'] = response.urljoin(item['link'])
+            
+                yield item
         if self.page < self.total_pages:
             self.page += 1
             yield scrapy.Request(

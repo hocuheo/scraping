@@ -62,8 +62,8 @@ def auth(f):
         if os.getenv('AUTH_ENABLED', 'false').lower() == 'true':
             stamp = float(request.getHeader(b'Authorization') or 0)
             now = datetime.now().timestamp()
-            delta = now - stamp
-            if  0 <= delta <= 500:
+            delta = abs(now - stamp)
+            if  0 <= delta <= 5000:
                 return f(request, *args, **kwargs)
             else:
                 request.setResponseCode(401)
